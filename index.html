@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проверка доступа</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+        #container {
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        #result {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <h2>Проверка доступа</h2>
+    <input type="text" id="userId" placeholder="Введите ID" />
+    <button onclick="checkAccess()">Проверить</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    function checkAccess() {
+        const userId = document.getElementById('userId').value;
+        const resultDiv = document.getElementById('result');
+        
+        if (!userId) {
+            resultDiv.textContent = "Пожалуйста, введите ID";
+            return;
+        }
+
+        // Отправляем GET-запрос к серверу для получения данных из data.json
+        fetch('https://postback-server-boba.onrender.com/data')
+            .then(response => response.json())
+            .then(data => {
+                // Ищем введенный ID в полученных данных
+                const userEntry = data.find(entry => entry.user_id === userId);
+
+                if (userEntry) {
+                    // Проверяем, больше ли сумма amount 5.00
+                    if (userEntry.amount > 5.00) {
+                        resultDiv.textContent = "Доступ разрешен";
+                    } else {
+                        resultDiv.textContent = "Доступ запрещен: сумма меньше 5.00";
+                    }
+                } else {
+                    resultDiv.textContent = "ID не найден";
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при получении данных:', error);
+                resultDiv.textContent = "Ошибка при загрузке данных";
+            });
+    }
+</script>
+
+</body>
+</html>
